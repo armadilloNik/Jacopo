@@ -39,10 +39,41 @@ namespace Jacopo.Tests
 
             players.Count().ShouldBeInRange(2, 5);
         }
+
+        public void PlayersShouldHaveTokens()
+        {
+            var noThanks = new NoThanksGame();
+
+            var players = noThanks.Components.OfType<Player>();
+
+            var tokenCounts = players.Select(p => p.Components.OfType<Token>().Count());
+
+            tokenCounts.Any(c => c != 11).ShouldBeFalse();
+
+        }
     }
 
-    public class Player : IGameComponent 
+    public class Token : IGameComponent
     {
+    }
+
+    public class Player : IGameComponent
+    {
+        private readonly List<IGameComponent> _components;
+        public IEnumerable<IGameComponent> Components => _components;
+
+        public Player(IEnumerable<IGameComponent> components = null)
+        {
+            _components = new List<IGameComponent>();
+
+            if(components.Any())
+                _components.AddRange(components);
+        }
+
+        public void GiveGomponent(IGameComponent component)
+        {
+            _components.Add(component);
+        }
 
     }
 
@@ -55,7 +86,7 @@ namespace Jacopo.Tests
         {
             _components = new List<IGameComponent> {new CardDeck(() => Enumerable.Range(2, 33))};
 
-            _components.AddRange(Enumerable.Range(1,3).Select(p => new Player()));
+            _components.AddRange(Enumerable.Range(1,3).Select(p => new Player(Enumerable.Range(1,11).Select(t => new Token()))));
 
         }
     }
