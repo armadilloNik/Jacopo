@@ -5,6 +5,11 @@ using Should;
 
 namespace Jacopo.Tests
 {
+    /// <summary>
+    ///  it seems like i don't really need all the horsepower and specificity 
+    ///  lisp may actually be more appropriate in this case. so what does that mean for the rest of things?
+    /// </summary>
+
     public class DefiningNoThanksTests
     {
         public void ShouldHaveOneAndOnlyOneDeck()
@@ -51,6 +56,20 @@ namespace Jacopo.Tests
             tokenCounts.Any(c => c != 11).ShouldBeFalse();
 
         }
+
+        public void StartingAGame()
+        {
+            var noThanks = new NoThanksGame();
+
+            noThanks.Start();
+
+            var deck = noThanks.Components.OfType<CardDeck>().Single();
+
+            var card = deck.ActiveCard;
+
+            card.ShouldNotBeNull();
+
+        }
     }
 
     public class Token : IGameComponent
@@ -87,6 +106,10 @@ namespace Jacopo.Tests
             _components = new List<IGameComponent> {new CardDeck(() => Enumerable.Range(2, 33))};
 
             _components.AddRange(Enumerable.Range(1,3).Select(p => new Player(Enumerable.Range(1,11).Select(t => new Token()))));
+        }
+
+        public void Start()
+        {
 
         }
     }
@@ -95,9 +118,15 @@ namespace Jacopo.Tests
     {
         public IEnumerable<Card> Cards { get; set; }
 
+        public Card ActiveCard => _activeCard;
+
+        private Card _activeCard;
+
         public CardDeck(Func<IEnumerable<int>> cardValues)
         {
             Cards = cardValues().Select(v => new Card(v));
+
+            _activeCard = Cards.First();
         }
     }
 
